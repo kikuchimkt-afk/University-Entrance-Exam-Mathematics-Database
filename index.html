@@ -42,6 +42,32 @@
   --radius-lg: 16px;
   --radius-xl: 20px;
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --header-bg: rgba(15,15,26,0.85);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f5fa;
+  --bg-secondary: #eeeef4;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f0f8;
+  --bg-modal: #ffffff;
+  --bg-input: #f0f0f6;
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a68;
+  --text-muted: #8888a0;
+  --text-accent: #6366f1;
+  --accent-primary: #6366f1;
+  --accent-secondary: #8b5cf6;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --border-color: #d8d8e8;
+  --border-hover: #c0c0d4;
+  --tag-bg: rgba(99, 102, 241, 0.08);
+  --tag-border: rgba(99, 102, 241, 0.2);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+  --shadow-glow: 0 0 20px var(--accent-glow);
+  --header-bg: rgba(245,245,250,0.85);
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -53,6 +79,7 @@ body {
   line-height: 1.7;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
 }
 
 ::-webkit-scrollbar { width:8px; height:8px; }
@@ -61,7 +88,7 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
 /* --- Header --- */
-.header { position:sticky; top:0; z-index:100; background:rgba(15,15,26,0.85); backdrop-filter:blur(20px); border-bottom:1px solid var(--border-color); padding:0 24px; }
+.header { position:sticky; top:0; z-index:100; background:var(--header-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--border-color); padding:0 24px; }
 .header-inner { max-width:1400px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; }
 .logo { display:flex; align-items:center; gap:12px; }
 .logo-icon { font-size:28px; filter:drop-shadow(0 0 8px var(--accent-glow)); }
@@ -242,6 +269,8 @@ body.admin-mode #adminToggle { background:var(--warning); color:white; border-ra
         <span class="logo-sub">共通テスト問題データベース</span>
       </div>
       <div class="header-actions">
+        <button class="btn btn-ghost btn-icon" id="themeToggle" onclick="toggleTheme()" title="テーマ切替">🌙</button>
+        <button class="btn btn-ghost btn-icon" onclick="openHelp()" title="使い方ガイド">❓</button>
         <button class="btn btn-ghost btn-icon" id="adminToggle" onclick="toggleAdminMode()" title="管理モード">🔧</button>
         <button class="btn btn-ghost btn-icon" id="selectModeBtn" onclick="toggleSelectMode()" title="選択モード">☐</button>
       </div>
@@ -325,6 +354,56 @@ body.admin-mode #adminToggle { background:var(--warning); color:white; border-ra
           <button class="view-tab" data-view="answer" onclick="switchView('answer')">✅ 解答のみ</button>
         </div>
         <button class="btn btn-primary" onclick="printCurrent()">🖨️ 印刷</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal-overlay" id="helpModal" onclick="if(event.target===this)closeHelp()">
+    <div class="modal-content" style="max-width:720px">
+      <div class="modal-header" style="display:flex!important;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)">
+        <h2 style="margin:0;font-size:18px;color:var(--text-primary)">📖 使い方ガイド</h2>
+        <button class="btn btn-ghost btn-icon" onclick="closeHelp()" style="font-size:20px">✕</button>
+      </div>
+      <div class="modal-body" style="padding:20px;max-height:70vh;overflow-y:auto;font-size:14px;line-height:1.7;color:var(--text-primary)">
+        <h3 style="margin:0 0 8px;font-size:15px;color:var(--text-accent)">🔍 検索・フィルタ</h3>
+        <ul style="margin:0 0 16px;padding-left:20px">
+          <li><b>出版社・年度・科目・回</b> のチップをクリックで絞り込み</li>
+          <li><b>キーワード検索</b>：問題名・タグ・トピック等で自由検索</li>
+          <li>複数条件の組み合わせ可能（AND検索）</li>
+        </ul>
+        <h3 style="margin:0 0 8px;font-size:15px;color:var(--text-accent)">👁️ 問題の閲覧</h3>
+        <ul style="margin:0 0 16px;padding-left:20px">
+          <li>カードをクリックで問題ビューアを表示</li>
+          <li><b>問題＋解答</b>：左右2列で同時表示</li>
+          <li><b>問題のみ / 解答のみ</b>：タブで切り替え</li>
+          <li>画像クリックで拡大表示</li>
+        </ul>
+        <h3 style="margin:0 0 8px;font-size:15px;color:var(--text-accent)">☐ 選択モード＆印刷</h3>
+        <ul style="margin:0 0 16px;padding-left:20px">
+          <li>ヘッダーの <b>☐</b> ボタンで選択モード ON/OFF</li>
+          <li>カードをクリックして複数問題を選択</li>
+          <li>画面下部のバーから <b>🖨️ 印刷</b> / <b>👁️ プレビュー</b></li>
+          <li>各画像が1ページに収まるよう自動縮小されます</li>
+          <li>問題と解答・解説は別ページに出力されます</li>
+        </ul>
+        <h3 style="margin:0 0 8px;font-size:15px;color:var(--text-accent)">🔧 管理モード（画像編集）</h3>
+        <ul style="margin:0 0 16px;padding-left:20px">
+          <li>ヘッダーの <b>🔧</b> ボタンで管理モード ON/OFF</li>
+          <li><b>画像の追加</b>：ドラッグ＆ドロップ / Ctrl+V でペースト</li>
+          <li><b>画像の削除</b>：画像上の ✕ ボタン</li>
+          <li><b>画像の並替</b>：↑↓ ボタンで順序変更</li>
+          <li>変更は自動的にクラウド（Google Drive）に保存されます</li>
+        </ul>
+        <h3 style="margin:0 0 8px;font-size:15px;color:var(--text-accent)">☁️ クラウド同期</h3>
+        <ul style="margin:0 0 16px;padding-left:20px">
+          <li>画像の修正データはGoogle Driveに自動保存</li>
+          <li>別のPCでも同じデータが利用可能</li>
+          <li>ローカルキャッシュ併用で高速表示</li>
+        </ul>
+        <div style="background:var(--surface-card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-top:8px">
+          <p style="margin:0;font-size:13px;color:var(--text-muted)">💡 <b>ヒント</b>：ビューア表示中に問題カードの 🖨️ ボタンを押すと、その問題だけを直接印刷できます。</p>
+        </div>
       </div>
     </div>
   </div>
@@ -5695,8 +5774,25 @@ async function deleteOverride(key) {
   gasDelete(key); // バックグラウンド
 }
 
+// --- Theme Toggle ---
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  document.getElementById('themeToggle').textContent = next === 'light' ? '☀️' : '🌙';
+}
+function initTheme() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = saved === 'light' ? '☀️' : '🌙';
+}
+
 // --- Initialize ---
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   loadAllBooks();
   buildFilterUI();
   renderCards();
@@ -6215,6 +6311,16 @@ function closeModal() {
   document.getElementById('viewerModal').classList.remove('active');
   document.body.style.overflow = '';
   currentViewData = null;
+}
+
+// --- Help Modal ---
+function openHelp() {
+  document.getElementById('helpModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeHelp() {
+  document.getElementById('helpModal').classList.remove('active');
+  document.body.style.overflow = '';
 }
 
 // --- Print ---
